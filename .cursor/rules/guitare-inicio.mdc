@@ -1,0 +1,45 @@
+---
+description: Contraintes self-hosted et interface Material UI de la plateforme de cours de guitare
+alwaysApply: true
+---
+
+# Cours de guitare self-hosted
+
+Applique ces contraintes à chaque changement. Tout reste en local via Docker Compose : ne propose pas de cloud managé (S3, Cloudinary, Firebase, Auth0).
+
+## Emplacement
+
+- `docker-compose.yml` — services `mongo`, `backend`, `frontend`
+- `backend/` — Express, Mongoose, streaming vidéo
+- `frontend/` — React (Vite) et Material UI (`@mui/material`, `@mui/icons-material`)
+- Vidéos sur le volume `/app/uploads`, jamais dans le statique Nginx
+
+## Interface
+
+Construis l’UI avec Material UI. Passe par `ThemeProvider`, `createTheme` et `CssBaseline`. Style avec `sx` ou `styled`, et prends les icônes dans `@mui/icons-material`.
+
+```jsx
+// ❌ BAD — style hors du thème
+<button className="bg-amber-600 px-4 py-2">Lire</button>
+
+// ✅ GOOD — composant et tokens du thème
+<Button variant="contained">Lire</Button>
+```
+
+## Données et rôles
+
+- Modèles Mongoose : `User`, `Course`, `Lesson`, `UserProgress`
+- `User.role` vaut `student` ou `admin`
+- Routes API et vues frontend séparées selon ce rôle
+
+## Lecture vidéo
+
+Affiche la leçon dans un `Card` Material UI, avec une balise `video` branchée sur l’URL authentifiée. Sers les MP4 et HLS uniquement via Express, après contrôle du JWT, en honorant l’en-tête `Range`.
+
+```js
+// ❌ BAD — fichier téléchargeable sans auth
+app.use('/uploads', express.static('/app/uploads'));
+
+// ✅ GOOD — flux authentifié, par tranches
+router.get('/lessons/:id/stream', requireAuth, streamLessonVideo);
+```
