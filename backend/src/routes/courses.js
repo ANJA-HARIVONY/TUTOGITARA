@@ -7,6 +7,7 @@ import UserProgress from '../models/UserProgress.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import { uploadVideo } from '../middleware/upload.js';
+import { coursePercent, presentProgress, resumeLessonId } from '../services/progressState.js';
 import { resolveUpload } from '../services/streamVideo.js';
 
 const router = Router();
@@ -33,14 +34,6 @@ function presentLesson(lesson) {
   };
 }
 
-function presentProgress(progress) {
-  if (!progress) return { completedLessonIds: [], lastLessonId: null };
-  return {
-    completedLessonIds: progress.completedLessons.map((id) => id.toString()),
-    lastLessonId: progress.lastLesson ? progress.lastLesson.toString() : null,
-  };
-}
-
 router.use(requireAuth);
 
 router.get('/', asyncHandler(async (req, res) => {
@@ -51,20 +44,27 @@ router.get('/', asyncHandler(async (req, res) => {
   const [lessonCounts, progresses] = await Promise.all([
     Lesson.aggregate([
       { $match: { course: { $in: courseIds } } },
-      { $group: { _id: '$course', count: { $sum: 1 } } },
+      { $sort: { order: 1, title: 1 } },
+      { $group: { _id: '$course', count: { $sum: 1 }, ids: { $push: '$_id' } } },
     ]),
     UserProgress.find({ user: req.user._id, course: { $in: courseIds } }),
   ]);
 
-  const lessonsByCourse = new Map(lessonCounts.map((row) => [row._id.toString(), row.count]));
+  const lessonsByCourse = new Map(lessonCounts.map((row) => [row._id.toString(), row]));
   const progressByCourse = new Map(progresses.map((row) => [row.course.toString(), row]));
 
   res.json({
     courses: courses.map((course) => {
+      const lessons = lessonsByCourse.get(course._id.toString());
       const progress = progressByCourse.get(course._id.toString());
+      const lessonIds = lessons?.ids || [];
       return presentCourse(course, {
-        lessonCount: lessonsByCourse.get(course._id.toString()) || 0,
+        lessonCount: lessons?.count || 0,
         completedCount: progress ? progress.completedLessons.length : 0,
+        percent: coursePercent(lessonIds, progress),
+        lastLessonId: progress?.lastLesson ? progress.lastLesson.toString() : null,
+        resumeLessonId: resumeLessonId(lessonIds, progress),
+        updatedAt: progress?.updatedAt || null,
       });
     }),
   });
@@ -79,7 +79,7 @@ router.post('/', requireRole('admin'), asyncHandler(async (req, res) => {
   if (!LEVELS.has(level)) return res.status(400).json({ message: 'Niveau invalide' });
 
   const course = await Course.create({ title, description, level, published: false });
-  return res.status(201).json({ course: presentCourse(course, { lessonCount: 0, completedCount: 0 }) });
+  return res.status(201).json({ course: presentCourse(course, { lessonCount: 0, completedCount: 0, percent: 0 }) });
 }));
 
 router.get('/:id', asyncHandler(async (req, res) => {
@@ -98,6 +98,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     course: presentCourse(course, {
       lessonCount: lessons.length,
       completedCount: progress ? progress.completedLessons.length : 0,
+      percent: coursePercent(lessons.map((lesson) => lesson._id), progress),
     }),
     lessons: lessons.map(presentLesson),
     progress: presentProgress(progress),

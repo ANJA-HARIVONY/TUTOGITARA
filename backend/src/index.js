@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js';
 import courseRoutes from './routes/courses.js';
 import lessonRoutes from './routes/lessons.js';
 import progressRoutes from './routes/progress.js';
+import userRoutes from './routes/users.js';
 import { seedAdmin } from './services/seedAdmin.js';
 
 process.env.MONGO_URI ||= 'mongodb://127.0.0.1:27017/guitare';
@@ -36,6 +37,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/users', userRoutes);
 app.use(errorHandler);
 
 let server;

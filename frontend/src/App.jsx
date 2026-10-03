@@ -1,10 +1,14 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from './pages/admin/AdminPage';
+import ProgressPage from './pages/admin/ProgressPage';
+import StudentProgressPage from './pages/admin/StudentProgressPage';
+import UsersPage from './pages/admin/UsersPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CatalogPage from './pages/student/CatalogPage';
+import CoursePage from './pages/student/CoursePage';
 import LessonPage from './pages/student/LessonPage';
 
 export default function App() {
@@ -20,15 +24,20 @@ export default function App() {
         )}
       >
         <Route path="/" element={<CatalogPage />} />
-        <Route path="/cours/:id" element={<LessonPage />} />
+        <Route path="/cours/:id" element={<CoursePage />} />
+        <Route path="/cours/:id/lecons/:lessonId" element={<LessonPage />} />
         <Route
-          path="/admin"
           element={(
             <ProtectedRoute roles={['admin']}>
-              <AdminPage />
+              <Outlet />
             </ProtectedRoute>
           )}
-        />
+        >
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/utilisateurs" element={<UsersPage />} />
+          <Route path="/admin/suivi" element={<ProgressPage />} />
+          <Route path="/admin/suivi/:userId" element={<StudentProgressPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

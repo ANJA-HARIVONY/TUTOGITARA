@@ -49,6 +49,13 @@ export const api = {
   deleteCourse: (id) => request(`/api/courses/${id}`, { method: 'DELETE' }),
   createLesson: (courseId, formData) => request(`/api/courses/${courseId}/lessons`, { method: 'POST', body: formData }),
   visitLesson: (courseId, lessonId) => request(`/api/progress/${courseId}/lessons/${lessonId}/visit`, { method: 'POST', body: {} }),
+  saveLessonProgress: (courseId, lessonId, percent) => request(`/api/progress/${courseId}/lessons/${lessonId}/progress`, { method: 'POST', body: { percent } }),
   completeLesson: (courseId, lessonId) => request(`/api/progress/${courseId}/lessons/${lessonId}/complete`, { method: 'POST', body: {} }),
+  users: () => request('/api/users'),
+  createUser: (body) => request('/api/users', { method: 'POST', body }),
+  updateUser: (id, body) => request(`/api/users/${id}`, { method: 'PATCH', body }),
+  deleteUser: (id) => request(`/api/users/${id}`, { method: 'DELETE' }),
+  studentProgress: () => request('/api/users/progress'),
+  userProgress: (id) => request(`/api/users/${id}/progress`),
   streamUrl: (lessonId) => `/api/lessons/${lessonId}/stream?token=${encodeURIComponent(getToken() || '')}`,
 };

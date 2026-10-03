@@ -121,7 +121,7 @@ export default function AdminPage() {
   return (
     <Stack spacing={3}>
       <Box>
-        <Typography variant="h4" component="h1">Administration</Typography>
+        <Typography variant="h4" component="h1">Cours</Typography>
         <Typography color="text.secondary">Crée les cours, ajoute les vidéos, puis publie.</Typography>
       </Box>
       {error && <Alert severity="error">{error}</Alert>}
@@ -174,7 +174,7 @@ export default function AdminPage() {
                     <LevelChip level={course.level} />
                   </Stack>
                   <Typography variant="body2" color="text.secondary">
-                    {course.lessonCount} leçon{course.lessonCount > 1 ? 's' : ''}
+                    {`${course.lessonCount} leçon${course.lessonCount > 1 ? 's' : ''}`}
                   </Typography>
                   <FormControlLabel
                     control={<Switch checked={course.published} onChange={() => togglePublished(course)} />}

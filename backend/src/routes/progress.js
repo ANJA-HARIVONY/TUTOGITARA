@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import Course from '../models/Course.js';
-import Lesson from '../models/Lesson.js';
-import UserProgress from '../models/UserProgress.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { requireAuth } from '../middleware/auth.js';
+import { presentProgress, recordLessonPercent } from '../services/progressState.js';
+import Course from '../models/Course.js';
+import Lesson from '../models/Lesson.js';
 
 const router = Router();
 
@@ -33,39 +33,29 @@ router.post('/:courseId/lessons/:lessonId/visit', asyncHandler(async (req, res) 
   const owned = await loadOwnedLesson(req, res);
   if (!owned) return undefined;
 
-  const progress = await UserProgress.findOneAndUpdate(
-    { user: req.user._id, course: owned.course._id },
-    { $set: { lastLesson: owned.lesson._id }, $setOnInsert: { completedLessons: [] } },
-    { upsert: true, new: true },
-  );
+  const progress = await recordLessonPercent(req.user._id, owned.course._id, owned.lesson._id, 0);
+  return res.json({ progress: presentProgress(progress) });
+}));
 
-  return res.json({
-    progress: {
-      completedLessonIds: progress.completedLessons.map((id) => id.toString()),
-      lastLessonId: progress.lastLesson ? progress.lastLesson.toString() : null,
-    },
-  });
+router.post('/:courseId/lessons/:lessonId/progress', asyncHandler(async (req, res) => {
+  const owned = await loadOwnedLesson(req, res);
+  if (!owned) return undefined;
+
+  const progress = await recordLessonPercent(
+    req.user._id,
+    owned.course._id,
+    owned.lesson._id,
+    req.body?.percent,
+  );
+  return res.json({ progress: presentProgress(progress) });
 }));
 
 router.post('/:courseId/lessons/:lessonId/complete', asyncHandler(async (req, res) => {
   const owned = await loadOwnedLesson(req, res);
   if (!owned) return undefined;
 
-  const progress = await UserProgress.findOneAndUpdate(
-    { user: req.user._id, course: owned.course._id },
-    {
-      $set: { lastLesson: owned.lesson._id },
-      $addToSet: { completedLessons: owned.lesson._id },
-    },
-    { upsert: true, new: true },
-  );
-
-  return res.json({
-    progress: {
-      completedLessonIds: progress.completedLessons.map((id) => id.toString()),
-      lastLessonId: progress.lastLesson ? progress.lastLesson.toString() : null,
-    },
-  });
+  const progress = await recordLessonPercent(req.user._id, owned.course._id, owned.lesson._id, 100);
+  return res.json({ progress: presentProgress(progress) });
 }));
 
 export default router;
