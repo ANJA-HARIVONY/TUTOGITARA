@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
-  if (ready && user) return <Navigate to="/" replace />;
+  if (ready && user) return <Navigate to="/catalogue" replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -36,9 +36,14 @@ export default function RegisterPage() {
       title="Inscription"
       subtitle="Un compte élève pour suivre les cours."
       footer={(
-        <Link component={RouterLink} to="/connexion">
-          J'ai déjà un compte
-        </Link>
+        <Stack spacing={1}>
+          <Link component={RouterLink} to="/connexion">
+            J’ai déjà un compte
+          </Link>
+          <Link component={RouterLink} to="/">
+            Retour à l’accueil
+          </Link>
+        </Stack>
       )}
     >
       <Stack component="form" spacing={2} onSubmit={handleSubmit}>

@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
-  if (ready && user) return <Navigate to="/" replace />;
+  if (ready && user) return <Navigate to="/catalogue" replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -35,9 +35,14 @@ export default function LoginPage() {
       title="Connexion"
       subtitle="Retrouve tes cours de guitare."
       footer={(
-        <Link component={RouterLink} to="/inscription">
-          Créer un compte élève
-        </Link>
+        <Stack spacing={1}>
+          <Link component={RouterLink} to="/inscription">
+            Créer un compte élève
+          </Link>
+          <Link component={RouterLink} to="/">
+            Retour à l’accueil
+          </Link>
+        </Stack>
       )}
     >
       <Stack component="form" spacing={2} onSubmit={handleSubmit}>

@@ -170,7 +170,7 @@ export default function LessonPage() {
     <Stack spacing={3}>
       <PageBreadcrumbs
         items={[
-          { label: 'Catalogue', to: '/' },
+          { label: 'Catalogue', to: '/catalogue' },
           { label: course.title, to: `/cours/${course.id}` },
           { label: selected?.title || 'Leçon' },
         ]}

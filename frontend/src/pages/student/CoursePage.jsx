@@ -70,7 +70,7 @@ export default function CoursePage() {
 
   return (
     <Stack spacing={3}>
-      <PageBreadcrumbs items={[{ label: 'Catalogue', to: '/' }, { label: course.title }]} />
+      <PageBreadcrumbs items={[{ label: 'Catalogue', to: '/catalogue' }, { label: course.title }]} />
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'flex-start' } }}>
         <Box sx={{ flexGrow: 1 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>

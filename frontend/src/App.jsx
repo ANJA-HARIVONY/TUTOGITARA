@@ -5,6 +5,7 @@ import AdminPage from './pages/admin/AdminPage';
 import ProgressPage from './pages/admin/ProgressPage';
 import StudentProgressPage from './pages/admin/StudentProgressPage';
 import UsersPage from './pages/admin/UsersPage';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CatalogPage from './pages/student/CatalogPage';
@@ -14,6 +15,7 @@ import LessonPage from './pages/student/LessonPage';
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route path="/connexion" element={<LoginPage />} />
       <Route path="/inscription" element={<RegisterPage />} />
       <Route
@@ -23,7 +25,7 @@ export default function App() {
           </ProtectedRoute>
         )}
       >
-        <Route path="/" element={<CatalogPage />} />
+        <Route path="/catalogue" element={<CatalogPage />} />
         <Route path="/cours/:id" element={<CoursePage />} />
         <Route path="/cours/:id/lecons/:lessonId" element={<LessonPage />} />
         <Route

@@ -33,7 +33,7 @@ function NavButton({ to, active, children }) {
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
-  const onCatalog = pathname === '/' || pathname.startsWith('/cours');
+  const onCatalog = pathname === '/catalogue' || pathname.startsWith('/cours');
   const onAdmin = pathname.startsWith('/admin');
 
   return (
@@ -49,7 +49,7 @@ export default function AppLayout() {
           >
             Fianarana Guitara
           </Typography>
-          <NavButton to="/" active={onCatalog}>Catalogue</NavButton>
+          <NavButton to="/catalogue" active={onCatalog}>Catalogue</NavButton>
           {user?.role === 'admin' && (
             <NavButton to="/admin" active={onAdmin}>Administration</NavButton>
           )}
